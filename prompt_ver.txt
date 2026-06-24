@@ -1,0 +1,109 @@
+
+Step 1: The "Codebase Ingestion" Prompt
+(Use this when uploading or pasting your component's codebase/scripts)
+
+[COPY BELOW THIS LINE]
+
+Role: You are an expert Avionics Software Engineer and Technical Release Manager. We are preparing to perform a version upgrade for a dependency/tool used in our project.
+
+Context: Before I give you the release notes for the upgraded dependency, I need you to understand the current state of our codebase. I have attached/pasted the relevant files from our component (including files like our Jenkinsfile, gradle/data.gradle, configuration scripts, and source code).
+
+Task: 1. Ingest these files and build an internal map of our architecture.
+2. Pay special attention to how we invoke our build pipelines, handle dependencies, and use external APIs or environment variables.
+3. Do NOT generate any Jira tickets or perform any impact analysis yet.
+
+Output: Simply reply with "Codebase successfully ingested." followed by a very brief bulleted list of the key files you recognize and their primary purposes. End your response by stating you are ready to receive the dependency release notes.
+
+Here is the codebase:
+[PASTE OR UPLOAD YOUR CODEBASE HERE]
+
+[STOP COPYING]
+
+|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+Step 2: The "Analyzer & Coder" Prompt
+(Use this when uploading your .txt release notes)
+
+[COPY BELOW THIS LINE]
+
+Role: You are an expert Avionics Software Engineer and Technical Release Manager. I have attached .txt files containing the Jira release notes for several version upgrades of a dependency we use.
+
+Context: Our component is [Insert Our Component, e.g., C00256]. The dependency being upgraded is [Insert Dependency, e.g., C00079].
+
+Task: Cross-reference these release notes against the codebase you ingested in Step 1. Determine exactly how each dependency change impacts our code. If diffs regarding any individual ticket may be needed, say so and I'll supply.
+
+Output Format:
+Analyze the release notes and split your output into individual version upgrades. For every version transition found in the notes, output your analysis EXACTLY following this template:
+
+— [Dependency] version update from [Old Version] to [New Version] —
+
+(List all tickets for this release. Format each ticket exactly as follows:)
+[Ticket ID] [Ticket Summary]
+[If there is an impact, write "IMPACT" followed by a clear explanation of what changed, including any UG/URQT/QINF updates. If there are multiple items, write "IMPACT:" and use a bulleted list on the following lines. Keep in mind impact refers to any ticket that forces any modification in files of the component whose dependency is being up]
+[If there is no impact to our component, write exactly "No user impact." on the line directly below the ticket title.]
+
+— Functional impact on [Our Component] of [Dependency] update ([Old Version] → [New Version]) —
+[State the functional impact here, e.g., "None."]
+
+— Impact on [Our Component] of [Dependency] update ([Old Version] → [New Version]) —
+[Group the required codebase modifications by Phase: e.g., SPEC/ARCHI, Environment, UG, CODE, etc. Under each phase, specify the exact file names and the specific instructions, re-generations, or modifications required.]
+
+[STOP COPYING]
+
+|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+
+Step 3: The "Closing Formatter" Prompt
+(Use this as the final prompt. You do not need to paste any code or diffs here—the AI will read the conversation history!)
+
+[COPY BELOW THIS LINE]
+
+Task: We are now closing this upgrade task. Relying entirely on our conversation history—specifically the code you ingested in Step 1 and the "Required Code Modifications" you generated in Step 2—generate the final Jira ticket fields: Solution Description, Impacted Elements, and Change Impact on Users. Follow the strict Airbus formatting rules below.
+
+Rule 1: Directory Mapping & Phase Association
+Look at the files we are modifying. Map them to a Phase based on their paths:
+
+PLAN: src/plan/
+
+SPEC/ARCHI: src/spec/
+
+DESIGN: src/design/
+
+CODE: src/main/c/, src/main/header/, src/main/asm/
+
+UNIT VERIF: src/verif/unit-test/
+
+INTEG VERIF: src/verif/integration/, src/toolchain/toolchain-TITV/, src/toolchain/toolchain-tienvbuild/
+
+USER GUIDE: src/delivery-doc/
+
+ENVIRONMENT: All other files not covered above (e.g., Jenkinsfile, gradle/, data.gradle, root files, etc.)
+
+Rule 2: Solution Description Format
+
+First, state the direct file changes grouped by Phase using an h2. header (e.g., h2. ENVIRONMENT -> Update [Dependency Name] to [Target Version] in [File].).
+
+Next, create an h2. [Dependency Name] update Impact section.
+
+List every single ticket from your Step 2 analysis (including the Notes), include all the tickets of each release. Format them exactly as:
+[Ticket ID] *[Ticket Summary]*
+
+On the next line, write the impact status from Step 2:
+
+If it had "User Impact", write: User Impact. [Brief explanation of what we changed].
+
+If it was "No user impact" or "Good to Know", write exactly: No user impact.
+
+Rule 3: Impacted Elements Table Logic
+
+Generate a Jira markdown table exactly formatted as: ||PHASE||IMPACTED (N/Y)||DESCRIPTION||.
+
+Based only on the files you identified in your "Required Code Modifications" section, mark 'Y' for the corresponding phases and list the file names (no full paths) in the DESCRIPTION. Mark 'N' for all other phases. (Note: Derog files like .dcsl_derog have no impact, IMPACTED = N).
+
+Rule 4: Change Impact on Users
+
+Answer exactly "Yes" or "No".
+
+If any ticket had "User Impact", this field MUST be "Yes". Otherwise, it is "No".
+
+Generate the final Jira ticket now.
+
+[STOP COPYING]
