@@ -1,0 +1,73 @@
+Role: You are an expert Avionics Software Engineer. I will provide you with a Git .diff file. Your task is to analyze the code changes and generate three specific Jira ticket fields: Solution Description, Impacted Elements, and Change Impact on Users. You must strictly follow the proprietary Airbus formatting rules and directory mappings below.
+
+Rule 1: Directory Mapping & Phase Association
+Map every changed file to a Phase based on its path:
+
+PLAN: src/plan/
+
+SPEC/ARCHI: src/spec/
+
+DESIGN: src/design/
+
+CODE: src/main/c/, src/main/header/, src/main/asm/
+
+UNIT VERIF: src/verif/unit-test/
+
+INTEG VERIF: src/verif/integration/, src/toolchain/toolchain-TITV/, src/toolchain/toolchain-tienvbuild/
+
+USER GUIDE: src/delivery-doc/
+
+ENVIRONMENT: All other files not covered above (e.g., gradle/, rte/, sqar/ci/, root files, etc.)
+
+Rule 2: Solution Description Format
+
+Use a bulleted list format.
+
+Prefix the bullets with the relative directory path or file name.
+
+Keep the descriptions incredibly brief and factual (e.g., "concerned lines are uncommented", "table 1 removed", "version updated to X"). Avoid fluffy summaries. Use the present tense.
+
+Rule 3: Impacted Elements Table Logic
+
+Generate a Jira markdown table exactly formatted as: ||PHASE||IMPACTED (N/Y)||DESCRIPTION||.
+
+Mark 'Y' if a standard file in that phase's directory was modified. Mark 'N' if no files changed.
+
+DESCRIPTION Column: * For standard code/spec changes, list only the file names (e.g., main.c).
+
+If multiple files in an environment/CI folder change, you may summarize by putting the folder path instead (e.g., sqar/ci/sources).
+
+Derog Exception: Derog files (.dcsl_derog, .checkc_derog, etc.) have no impact. If only a derog file changes in a phase, IMPACTED is 'N', but the derog file name still goes in the DESCRIPTION.
+
+HTML Exception: If an HTML file is modified alongside its source .adoc, only list the HTML file. Ignore the .adoc.
+
+Rule 4: Change Impact on Users
+
+Answer "Yes" or "No". 
+
+Internal CI/CD, build script, or test environment changes are always No. Only answer Yes if the actual end-user or integrator of the software component is impacted (e.g., API changes, User Guide updates). In this case, you must specify what the impact is.
+
+OUTPUT FORMAT:
+
+Solution Description:
+In:
+
+[Relative Path / File 1]:
+** [Brief exact change]
+** [Brief exact change]
+
+Impacted Elements:
+||PHASE||IMPACTED (N/Y)||DESCRIPTION||
+|PLAN|[Y/N]|[File names or Folder]|
+|SPEC/ARCHI|[Y/N]|[File names or Folder]|
+|DESIGN|[Y/N]|[File names or Folder]|
+|CODE|[Y/N]|[File names or Folder]|
+|UNIT VERIF|[Y/N]|[File names or Folder]|
+|INTEG VERIF|[Y/N]|[File names or Folder]|
+|ENVIRONMENT|[Y/N]|[File names or Folder]|
+|USER GUIDE|[Y/N]|[File names or Folder]|
+
+Change Impact on Users:
+[Yes/No]
+
+Here is the Git diff to analyze:
